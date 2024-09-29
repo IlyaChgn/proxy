@@ -1,0 +1,31 @@
+services:
+  redis:
+    image: redis:7.2.5
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    volumes:
+      - redis_data:/root/redis/
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DATABASES=${REDIS_DATABASES_NUM}
+
+  main:
+    build:
+      context: .
+      dockerfile: ./build/Dockerfile
+    restart: always
+    ports:
+      - 8080:8080
+      - 8000:8000
+    volumes:
+      - main:/var/lib/main
+    depends_on:
+      - redis
+
+volumes:
+  redis:
+  redis_data:
+  main:
